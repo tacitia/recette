@@ -1,0 +1,21 @@
+{% extends "homepage/base.html" %}
+
+{% block title %}
+  Tasks
+{% endblock %}
+
+{% block content %}
+
+  <p>This is {{ user_name }} 's kitchen.</p>
+
+  {% if all_ingredient_list %}
+    <ul>
+      {% for ingredient in all_ingredient_list %}
+    	<p>{{ ingredient.name }}</p>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No ingredients are available.</p>
+  {% endif %}
+  
+{% endblock %}

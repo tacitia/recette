@@ -25,3 +25,5 @@ class KitchenIngredientList(models.Model):
 
 	def __unicode__(self):
 		return 'Ingredients owned by ' + self.kitchen.user.username
+
+

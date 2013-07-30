@@ -1,0 +1,8 @@
+<h3>Login page</h3>
+
+<form action="{% url 'accounts:login' %}" method="post">
+{% csrf_token %}
+	<input type="text" name="username" placeholder="Your username"/>
+	<input type="text" name="password" placeholder="Your password"/>
+	<input type="submit" value="Login" />
+</form>

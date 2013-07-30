@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>{% block title %}Recette{% endblock %}</title>
+</head>
+
+<body>
+
+	<div id="topbar">
+		<div class="navbar">
+			<div class="navbar-side navbar-left"></div>
+			<div class="navbar-content">
+			  {% if user.is_authenticated %}
+				<span>Welcome, {{ user.username }}</span>         	        	
+				<a href="{% url 'accounts:logout' %}">Logout</a>
+			  {% else %}
+				<span>Welcome, </span>         	
+				<a href="{% url 'accounts:login' %}">Login</a> or
+				<a href="{% url 'accounts:register' %}">Sign up</a>
+			  {% endif %}
+			</div>
+			<div class="navbar-side navbar-right"></div>
+		</div>
+	</div>
+
+    <div id="content">
+        {% block content %}Oops...you have wandered into an undefined area.{% endblock %}
+    </div>
+</body>
+</html>

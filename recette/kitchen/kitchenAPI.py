@@ -38,7 +38,7 @@ def getAllIngredientNames():
 We do not need userID here!! It SHOULD BE requested from Authentification system.
 """
 def addIngredient(currentUser,ingredient,amount = 0):
-    if amount = 0:
+    if amount == 0:
         amount = ingredient.defaultAmount
     kitchen = currentUser.kitchen_set
     myKitchen = kitchen[0]
