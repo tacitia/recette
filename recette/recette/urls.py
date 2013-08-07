@@ -15,6 +15,6 @@ urlpatterns = patterns('',
     
 	url(r'^kitchen/', include('kitchen.urls', namespace='kitchen')),
 	url(r'^accounts/', include('accounts.urls', namespace='accounts')),
-    url(r'^admin/', include(admin.site.urls)),
+        url(r'^admin/', include(admin.site.urls)),
 	url(r'^$', hpViews.index, name='index'),
 )

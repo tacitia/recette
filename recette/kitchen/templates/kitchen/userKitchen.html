@@ -5,17 +5,83 @@
 {% endblock %}
 
 {% block content %}
+  <script type = "text/javascript">
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+  }
+  var csrftoken = getCookie('csrftoken');
+  function csrfSafeMethod(method) {
+      // these HTTP methods do not require CSRF protection
+      return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
+  }
+  $.ajaxSetup({
+      crossDomain: false, // obviates need for sameOrigin test
+      beforeSend: function(xhr, settings) {
+          if (!csrfSafeMethod(settings.type)) {
+              xhr.setRequestHeader("X-CSRFToken", csrftoken);
+          }
+      }
+  });    
+  function addIngredientAmount(ingredientID){
+      $.post(location.href+"addIngredientAmount/",
+        JSON.stringify({
+          "ingredientID":ingredientID,
+          "amountAdd":$("#amountInput"+ingredientID).val()
+        }),function(data){
+           location.reload()
+        }
+      ).fail(function() { alert("error"); })
+    }
+    function stopPosting(e,ingredientID){
+      e.preventDefault();
+      addIngredientAmount(ingredientID);
+      return false;
+    }
 
-  <p>This is {{ user_name }} 's kitchen.</p>
+    function addNewIngredient(e){
+       e.preventDefault();
+       $.post(location.href+"addNewIngredient/",
+        JSON.stringify({
+          "ingredientName":$("#ingredientSelector").val(),
+          "amount":$("#amountInputNewIngredient").val()
+        }),function(data){
+           location.reload()
+        }
+      ).fail(function() { alert("error"); })      
+    }
+  </script>
+  <p>This is {{ user.username }} 's kitchen.</p>
 
   {% if all_ingredient_list %}
     <ul>
-      {% for ingredient in all_ingredient_list %}
-    	<p>{{ ingredient.name }}</p>
+      {% for ingredient,amount in all_ingredient_list %}
+      <p><form onSubmit="stopPosting(event,{{ingredient.pk}});">  {{ ingredient.name }} {{amount}} {{ingredient.basic_measure}}+<input type = "text" id = "amountInput{{ingredient.pk}}"><input type = "submit" value = "add"></form></p>
       {% endfor %}
     </ul>
-  {% else %}
+    {% else %}
     <p>No ingredients are available.</p>
   {% endif %}
-  
+    <form onSubmit="addNewIngredient(event);">
+      add 
+      <select id = "ingredientSelector">
+	<option value="" disabled="disabled" selected="selected">Please select a ingredient</option>
+	{% for ingredientName in all_ingredient_Names%}
+	<option value="{{ingredientName}}">{{ingredientName}}</option>
+	{% endfor %}
+      </select>
+      <input type = "text" id = "amountInputNewIngredient">
+      <input type = "submit" value = "add">
+    </form>
 {% endblock %}

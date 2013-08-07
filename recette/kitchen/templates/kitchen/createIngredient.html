@@ -1,0 +1,12 @@
+{% extends "homepage/base.html" %}
+
+{% block content %}
+   <form action = "." method = "post">{% csrf_token %}
+     Ingredient name: <input type="text" name="ingredientName"><br>
+     Ingredient type: <input type="text" name="ingredientType"><br>
+     basic measure:<input type="text" name="basicMeasure"><br>
+     brand: <input type="text" name="brand"><br>
+     default amount:<input type="text" name="defaultAmount"><br>
+     <input type="submit" value="Submit">
+   </form> 
+{% endblock %}

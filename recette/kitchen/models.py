@@ -4,9 +4,10 @@ from django.contrib.auth.models import User
 class Ingredient(models.Model):
 	name = models.CharField(max_length=128)
 	basic_measure = models.CharField(max_length=32)
-	type = models.CharField(max_length=32)
+	ingredientType = models.CharField(max_length=32)
 	brand = models.CharField(max_length=128)
-	
+	defaultAmount = models.PositiveIntegerField()
+
 	def __unicode__(self):
 		return self.name
 	
@@ -22,8 +23,7 @@ class Kitchen(models.Model):
 class KitchenIngredientList(models.Model):
 	ingredient = models.ForeignKey(Ingredient)
 	kitchen = models.ForeignKey(Kitchen)
+	amount = models.PositiveIntegerField()
 
 	def __unicode__(self):
 		return 'Ingredients owned by ' + self.kitchen.user.username
-
-

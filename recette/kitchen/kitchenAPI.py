@@ -1,11 +1,7 @@
 from kitchen.models import Ingredient,Kitchen,KitchenIngredientList
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.models import User
-"""
-We do not need userID here!! It SHOULD BE requested from Authentification system.
-"""
-def getCurrentUser():
-    return User.objects.get(username='ron')
+
 def createKitchen(currentUser):
     """
     initilize kitchen for the current user
@@ -16,9 +12,11 @@ def createKitchen(currentUser):
 def getKitchenIngredientList(currentUser):
     try:
         uKitchen = Kitchen.objects.get(user=currentUser.pk)
-        return uKitchen.ingredients.all()
+        return zip(uKitchen.ingredients.all(),[float(temp.amount/100.0) for temp in uKitchen.kitcheningredientlist_set.all()])
     except ObjectDoesNotExist:
-        print("User doesn't exist.")
+        createKitchen(currentUser)
+        uKitchen = Kitchen.objects.get(user=currentUser.pk)
+        return (uKitchen.ingredients.all(),[temp.amout for temp in uKitchen.kitcheningredientlist_set.all()])   
 
 def getNonZeroAmountIngredients(currentUser):
     try:
@@ -37,39 +35,63 @@ def getAllIngredientNames():
 """
 We do not need userID here!! It SHOULD BE requested from Authentification system.
 """
-def addIngredient(currentUser,ingredient,amount = 0):
+"""
+def addIngredient(currentUser,ingredientID,amount = 0):
     if amount == 0:
         amount = ingredient.defaultAmount
-    kitchen = currentUser.kitchen_set
-    myKitchen = kitchen[0]
+    myKitchen = Kitchen.objects.get(user = currentUser)
     kitchenIngredientListMy = myKitchen.kitcheningredientlist_set
-    if not kitchenIngredientListMy.get(ingredient__pk = ingredient.pk):
+    if not kitchenIngredientListMy.get(ingredient__pk = ingredientID):
+        newKitchenIngredientList = KitchenIngredientList(ingredient = Ingredient.objects.get(pk = ingredientID),kitchen = myKitchen,amount = amount)
+        newKitchenIngredientList.save()
+    else:
+        x = kitchenIngredientListMy.get(ingredient__pk = ingredientID)
+        x.amount = amount
+        x.save()
+"""
+def addIngredient(currentUser,ingredientName,amount = 0,ingredientID = -1):
+    if amount == 0:
+        amount = ingredient.defaultAmount
+    myKitchen = Kitchen.objects.get(user = currentUser)
+    kitchenIngredientListMy = myKitchen.kitcheningredientlist_set
+    theIngredient = Ingredient.objects.get(name = ingredientName)
+    if not kitchenIngredientListMy.filter(ingredient__pk = theIngredient.pk):
+        newKitchenIngredientList = KitchenIngredientList(ingredient = theIngredient,kitchen = myKitchen,amount = amount)
+        newKitchenIngredientList.save()
+    else:
+        x = kitchenIngredientListMy.get(ingredient__pk = theIngredient.pk)
+        x.amount = x.amount + amount
+        x.save()
+
+    
+def increaseIngredientAmount(currentUser, ingredientID, amount = 0):
+    myKitchen = Kitchen.objects.get(user = currentUser)
+    kitchenIngredientListMy = myKitchen.kitcheningredientlist_set
+    if not kitchenIngredientListMy.filter(ingredient__pk = ingredientID):
+        """
+        Create a new relation here!!!!!!
+        """
+        newKitchenIngredientList = KitchenIngredientList(ingredient = Ingredient.object.get(pk = ingredientID),kitchen = myKitchen,amount = amount)
+        newKitchenIngredientList.save()
+    else:
+        print "Add amount"
+        x = kitchenIngredientListMy.get(ingredient__pk = ingredientID)
+        x.amount = x.amount + amount
+        x.save()
+
+def modifyIngredientAmount(currentUser, ingredient, amount):
+    myKitchen = Kitchen.objects.get(user = currentUser)
+    kitchenIngredientListMy = myKitchen.kitcheningredientlist_set
+    if not kitchenIngredientListMy.filter(ingredient__pk = ingredient.pk):
         """
         Create a new relation here!!!!!!
         """
         newKitchenIngredientList = KitchenIngredientList(ingredient = ingredient,kitchen = myKitchen,amount = amount)
         newKitchenIngredientList.save()
     else:
-        for x in kitchenIngredientListMy:
-            x.amount = x.amount + amount
-            x.save()
-    
-        
-    
-def ModifyIngredientAmount(currentUser, ingredient, amount):
-    kitchen = currentUser.kitchen_set
-    myKitchen = kitchen[0]
-    kitchenIngredientListMy = myKitchen.kitcheningredientlist_set
-    if not kitchenIngredientListMy.get(ingredient__pk = ingredient.pk):
-        """
-        Create a new relation here!!!!!!
-        """
-        newKitchenIngredientList = KitchenIngredientList(ingredient = ingredient,kitchen = myKitchen,amount = amount)
-        newKitchenIngredientList.save()
-    else:
-        for x in kitchenIngredientListMy:
-            x.amount = amount
-            x.save()
+        x = kitchenIngredientListMy.get(ingredient__pk = ingredient.pk)
+        x.amount = amount
+        x.save()
 
 def createIngredient(ingredientName,basicMeasure,ingredientType,brand,dAmount):
     ingredientNew = Ingredient(name = ingredientName,
